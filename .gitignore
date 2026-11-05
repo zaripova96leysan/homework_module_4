@@ -7,5 +7,3 @@ db.sqlite3
 __pycache__/
 *.py[cod]
 .env
-.DS_Store
-Thumbs.db
