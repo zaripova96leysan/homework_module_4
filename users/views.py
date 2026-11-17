@@ -1,16 +1,17 @@
-from rest_framework import generics, filters
-from .models import Payment
-from .serializers import PaymentSerializer
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, permissions
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .models import User
+from .serializers import UserSerializer, MyTokenObtainPairSerializer
 
+class UserListCreateView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
-class PaymentListView(generics.ListAPIView):
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
+class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
-
-    ordering_fields = ['payment_date']
-
-    filterset_fields = ['course', 'lesson', 'payment_method']
-
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
