@@ -5,6 +5,7 @@ class Course(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название')
     preview = models.ImageField(upload_to='courses/', verbose_name='Превью', blank=True, null=True)
     description = models.TextField(verbose_name='Описание')
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Цена')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Владелец')
 
     def __str__(self):
@@ -15,13 +16,12 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название')
     description = models.TextField(verbose_name='Описание')
     preview = models.ImageField(upload_to='lessons/', verbose_name='Превью', blank=True, null=True)
-    video_link = models.URLField(verbose_name='Ссылка на видео', blank=True, null=True) # <--- ВОТ ОНО НАШЕ ПОЛЕ ДЛЯ ВАЛИДАТОРА
+    video_link = models.URLField(verbose_name='Ссылка на видео', blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='Курс')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Владелец')
 
     def __str__(self):
         return self.title
-
 
 
 class Subscription(models.Model):
@@ -35,3 +35,14 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f'{self.user} подписан на {self.course}'
+
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lms_payments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lms_payments')
+    stripe_product_id = models.CharField(max_length=255, blank=True)
+    stripe_price_id = models.CharField(max_length=255, blank=True)
+    stripe_session_id = models.CharField(max_length=255, blank=True)
+    payment_url = models.URLField(blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
